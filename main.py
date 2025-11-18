@@ -111,6 +111,22 @@ class Shoping_Behavior:
         plt.tight_layout()
         plt.show()
 
+    def purchase_amount(self):
+        
+        # Creating Histogram
+        plt.figure(figsize=(10,8))
+        plt.hist(self.df["Purchase Amount (USD)"],
+                 bins=25,
+                 edgecolor="#002358",
+                 color="#458ffd")
+        
+        
+        plt.xlabel("Purchase Amount (USD)", fontsize=14)
+        plt.ylabel("Count", fontsize=14)
+        plt.title("Shopping anlysis by Purchase Amount (USD)", fontsize=20)
+        plt.tight_layout()
+        plt.show()
+
 
 def main():
     csv_file_path = "deta_set/shopping_behavior.csv"
@@ -124,6 +140,7 @@ def main():
         print("2. Age Analysis")
         print("3. Item Analysis")
         print("4. Category Analysis")
+        print("5. Purchase Amount analysis")
         print("Exit\n")
 
         
@@ -139,6 +156,8 @@ def main():
                 analize.item_list()
             case "4":
                 analize.category()
+            case "5":
+                analize.purchase_amount()
             case "exit":
                 sys.exit()
             case _:
