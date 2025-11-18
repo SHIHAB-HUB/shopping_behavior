@@ -65,12 +65,14 @@ class Shoping_Behavior:
     # DataFrame with Items
     # ================================
     def item_list(self):
+        # Creating DataFrame and cleaning
         items_df = pd.DataFrame(self.df["Item Purchased"].value_counts())
         items_df = items_df.rename(columns={"count": "Value"})
         items_df = items_df.reset_index()
         
         colour = plt.cm.viridis(np.linspace(0, 1, len(items_df)))
         
+        # Creating bar chart
         plt.figure(figsize=(10,8))
         
         plt.barh(items_df["Item Purchased"],
@@ -92,8 +94,22 @@ class Shoping_Behavior:
     # Catagory separation
     # ================================
     def category(self):
-        pass
-
+        category_df = pd.DataFrame(self.df["Category"].value_counts())
+        category_df = category_df.rename(columns={"count": "Value"})
+        category_df = category_df.reset_index()
+        
+        # print(category_df)
+        
+        category_df.plot.pie(y="Value",
+                             labels=category_df["Category"],
+                             autopct="%1.1f%%",
+                             shadow=True,
+                             figsize=(10,8),
+                             textprops={"fontsize": 14})
+        
+        plt.title("Shopping anlysis with Category", fontsize=20)
+        plt.tight_layout()
+        plt.show()
 
 
 def main():
@@ -107,6 +123,7 @@ def main():
         print("1. Gender Analysis")
         print("2. Age Analysis")
         print("3. Item Analysis")
+        print("4. Category Analysis")
         print("Exit\n")
 
         
@@ -120,6 +137,8 @@ def main():
                 analize.age_separation()
             case "3":
                 analize.item_list()
+            case "4":
+                analize.category()
             case "exit":
                 sys.exit()
             case _:

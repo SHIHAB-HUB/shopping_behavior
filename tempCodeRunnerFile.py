@@ -1,1 +1,1 @@
-items_df[value]
+{"count": "Value"}
