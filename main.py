@@ -8,6 +8,11 @@ class Shoping_Behavior:
         self.df = pd.read_csv(file_path)
         print("Dataframe initialization successful!!")   
         
+    @staticmethod
+    def __color_genarator(df):
+        return plt.cm.viridis(np.linspace(0, 1, len(df)))
+    
+    
     # ================================
     # Gender count
     # ================================
@@ -27,7 +32,7 @@ class Shoping_Behavior:
                            figsize = (10,8),
                            textprops={'fontsize': 14})
         
-        plt.title("Customer anlysis with Gender", size=20)
+        plt.title("Customer analysis with Gender", size=20)
         plt.tight_layout()
         plt.show()
         
@@ -57,7 +62,7 @@ class Shoping_Behavior:
                                  figsize = (10,8),
                                  textprops={'fontsize': 14})
 
-        plt.title("Customer anlysis with age", fontsize=20)
+        plt.title("Customer analysis with age", fontsize=20)
         plt.tight_layout()
         plt.show()
 
@@ -70,7 +75,7 @@ class Shoping_Behavior:
         items_df = items_df.rename(columns={"count": "Value"})
         items_df = items_df.reset_index()
         
-        colour = plt.cm.viridis(np.linspace(0, 1, len(items_df)))
+        colour = self.__color_genarator(items_df)
         
         # Creating bar chart
         plt.figure(figsize=(10,8))
@@ -86,7 +91,7 @@ class Shoping_Behavior:
         
         plt.xlabel("Purchased Amount", fontsize = 14)
         plt.ylabel("Name of Items", fontsize = 14)
-        plt.title("Customer anlysis with Item Purchased", size=20)
+        plt.title("Customer analysis with Item Purchased", size=20)
         plt.tight_layout()
         plt.show()
 
@@ -98,8 +103,6 @@ class Shoping_Behavior:
         category_df = category_df.rename(columns={"count": "Value"})
         category_df = category_df.reset_index()
         
-        # print(category_df)
-        
         category_df.plot.pie(y="Value",
                              labels=category_df["Category"],
                              autopct="%1.1f%%",
@@ -107,10 +110,13 @@ class Shoping_Behavior:
                              figsize=(10,8),
                              textprops={"fontsize": 14})
         
-        plt.title("Shopping anlysis with Category", fontsize=20)
+        plt.title("Shopping analysis with Category", fontsize=20)
         plt.tight_layout()
         plt.show()
 
+    # ================================
+    # Purchase Amount Analysis
+    # ================================
     def purchase_amount(self):
         
         # Creating Histogram
@@ -120,17 +126,89 @@ class Shoping_Behavior:
                  edgecolor="#002358",
                  color="#458ffd")
         
-        
         plt.xlabel("Purchase Amount (USD)", fontsize=14)
         plt.ylabel("Count", fontsize=14)
-        plt.title("Shopping anlysis by Purchase Amount (USD)", fontsize=20)
+        plt.title("Shopping analysis by Purchase Amount (USD)", fontsize=20)
         plt.tight_layout()
         plt.show()
 
+    def color_analysis(self):
+        # color DataFrame
+        color_df = pd.DataFrame(self.df["Color"].value_counts())
+        color_df = color_df.rename(columns={"count": "Value"})
+        color_df = color_df.reset_index()
+        
+        colors = self.__color_genarator(color_df)
+        
+        # Plotting the Horizontal Bar Chart
+        plt.figure(figsize=(10,8))
+        
+        plt.barh(color_df["Color"],
+                 color_df["Value"],
+                 color=colors)
+        
+        for index, value in enumerate(color_df["Value"]):
+            plt.text(value, index, f"{value}", va="center")
+        
+        plt.xlabel("Value", fontsize=14)
+        plt.ylabel("Colors", fontsize=14)
+        plt.title("Shopping analysis with Category", fontsize=20)
+        plt.tight_layout()
+        plt.show()
+    
+    def payment_method(self):
+        # Payment Methods DataFrame
+        payment_method_df = pd.DataFrame(self.df["Payment Method"].value_counts())
+        payment_method_df = payment_method_df.rename(columns={"count": "Value"})
+        payment_method_df = payment_method_df.reset_index()
+        
+        # Plotting the Pie Chart
+        payment_method_df.plot.pie(y="Value",
+                                   labels= payment_method_df["Payment Method"],
+                                   autopct= "%1.1f%%",
+                                   shadow= True,
+                                   figsize=( 10, 8),
+                                   textprops={"fontsize": 14})
 
+        plt.title("Shopping analysis with Payment Methods", fontsize=20)
+        plt.tight_layout()
+        plt.show()
+        
+        
+    def frequency_purchases(self):
+        # Frequency of Purchases DataFrame
+        frequency_purchases_df = pd.DataFrame(self.df["Frequency of Purchases"].value_counts())
+        frequency_purchases_df = frequency_purchases_df.rename(columns={"count": "Value"})
+        frequency_purchases_df = frequency_purchases_df.reset_index()
+        
+        colors = self.__color_genarator(frequency_purchases_df)
+        
+        # Plotting bar char for Frequency of Purchases
+        plt.figure(figsize=(10, 8))
+        
+        plt.bar(frequency_purchases_df["Frequency of Purchases"],
+                frequency_purchases_df["Value"],
+                color=colors)
+        
+        plt.xlabel("Frequency of Purchases", fontsize=14)
+        plt.ylabel("Value", fontsize=14)
+        plt.title("Shopping analysis with Frequency of Purchases", fontsize=20)
+        plt.tight_layout()
+        plt.show()
+    
+    def gender_based_purchase(self):
+        pass
+    
+    def spending_pattern(self):
+        pass
+    
+    def age_purchase_behavior(self):
+        pass
+    
+    
 def main():
     csv_file_path = "deta_set/shopping_behavior.csv"
-    analize = Shoping_Behavior(csv_file_path)
+    analyze = Shoping_Behavior(csv_file_path)
     
     while True:
         print("=====================================")
@@ -141,6 +219,9 @@ def main():
         print("3. Item Analysis")
         print("4. Category Analysis")
         print("5. Purchase Amount analysis")
+        print("6. Color Analysis")
+        print("7. Payment Method Analysis")
+        print("8. Frequency of Purchases analsis")
         print("Exit\n")
 
         
@@ -149,23 +230,27 @@ def main():
         
         match (option):
             case "1":
-                analize.gender_count()
+                analyze.gender_count()
             case "2":
-                analize.age_separation()
+                analyze.age_separation()
             case "3":
-                analize.item_list()
+                analyze.item_list()
             case "4":
-                analize.category()
+                analyze.category()
             case "5":
-                analize.purchase_amount()
+                analyze.purchase_amount()
+            case "6":
+                analyze.color_analysis()
+            case "7":
+                analyze.payment_method()
+            case "8":
+                analyze.frequency_purchases()
             case "exit":
                 sys.exit()
             case _:
                 print("Enter a wrong option!!\n")
         
   
-
-
 if __name__ == "__main__":
     main()
     
