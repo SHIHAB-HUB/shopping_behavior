@@ -152,7 +152,7 @@ class Shoping_Behavior:
         
         plt.xlabel("Value", fontsize=14)
         plt.ylabel("Colors", fontsize=14)
-        plt.title("Shopping analysis with Category", fontsize=20)
+        plt.title("Shopping analysis with colors", fontsize=20)
         plt.tight_layout()
         plt.show()
     
