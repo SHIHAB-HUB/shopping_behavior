@@ -6,12 +6,19 @@ import sys
 class Shoping_Behavior:
     def __init__(self, file_path):
         self.df = pd.read_csv(file_path)
+        self.figure_size = (18, 9)
         print("Dataframe initialization successful!!")   
         
     @staticmethod
     def __color_genarator(df):
         return plt.cm.viridis(np.linspace(0, 1, len(df)))
     
+    def __gender_and_item_separator(self, gender, item):
+        gender_df = self.df[self.df["Gender"] == gender]
+        gender_and_item_df = pd.DataFrame(gender_df[item].value_counts())
+        gender_and_item_df = gender_and_item_df.rename(columns={"count": "Value"})
+        gender_and_item_df = gender_and_item_df.reset_index()
+        return gender_and_item_df
     
     # ================================
     # Gender count
@@ -29,7 +36,7 @@ class Shoping_Behavior:
                            autopct="%1.1f%%",
                            startangle=145,
                            shadow=True,
-                           figsize = (10,8),
+                           figsize = self.figure_size,
                            textprops={'fontsize': 14})
         
         plt.title("Customer analysis with Gender", size=20)
@@ -59,7 +66,7 @@ class Shoping_Behavior:
                                  labels = filtered_age_df["Category"],
                                  autopct="%1.1f%%",
                                  shadow=True,
-                                 figsize = (10,8),
+                                 figsize = self.figure_size,
                                  textprops={'fontsize': 14})
 
         plt.title("Customer analysis with age", fontsize=20)
@@ -78,7 +85,7 @@ class Shoping_Behavior:
         colour = self.__color_genarator(items_df)
         
         # Creating bar chart
-        plt.figure(figsize=(10,8))
+        plt.figure(figsize=self.figure_size)
         
         plt.barh(items_df["Item Purchased"],
                  items_df["Value"],
@@ -107,7 +114,7 @@ class Shoping_Behavior:
                              labels=category_df["Category"],
                              autopct="%1.1f%%",
                              shadow=True,
-                             figsize=(10,8),
+                             figsize=self.figure_size,
                              textprops={"fontsize": 14})
         
         plt.title("Shopping analysis with Category", fontsize=20)
@@ -120,7 +127,7 @@ class Shoping_Behavior:
     def purchase_amount(self):
         
         # Creating Histogram
-        plt.figure(figsize=(10,8))
+        plt.figure(figsize=self.figure_size)
         plt.hist(self.df["Purchase Amount (USD)"],
                  bins=25,
                  edgecolor="#002358",
@@ -141,7 +148,7 @@ class Shoping_Behavior:
         colors = self.__color_genarator(color_df)
         
         # Plotting the Horizontal Bar Chart
-        plt.figure(figsize=(10,8))
+        plt.figure(figsize=self.figure_size)
         
         plt.barh(color_df["Color"],
                  color_df["Value"],
@@ -167,7 +174,7 @@ class Shoping_Behavior:
                                    labels= payment_method_df["Payment Method"],
                                    autopct= "%1.1f%%",
                                    shadow= True,
-                                   figsize=( 10, 8),
+                                   figsize=self.figure_size,
                                    textprops={"fontsize": 14})
 
         plt.title("Shopping analysis with Payment Methods", fontsize=20)
@@ -184,7 +191,7 @@ class Shoping_Behavior:
         colors = self.__color_genarator(frequency_purchases_df)
         
         # Plotting bar char for Frequency of Purchases
-        plt.figure(figsize=(10, 8))
+        plt.figure(figsize=self.figure_size)
         
         plt.bar(frequency_purchases_df["Frequency of Purchases"],
                 frequency_purchases_df["Value"],
@@ -197,7 +204,58 @@ class Shoping_Behavior:
         plt.show()
     
     def gender_based_purchase(self):
-        pass
+        male_based_df = self.__gender_and_item_separator(gender="Male", item="Item Purchased")
+        female_based_df = self.__gender_and_item_separator(gender="Female", item="Item Purchased")
+        
+        plt.figure(figsize=self.figure_size)
+        
+        plt.scatter(male_based_df["Item Purchased"],
+                    male_based_df["Value"],
+                    label="Male",
+                    color="skyblue",
+                    alpha=0.8,
+                    s=100)
+        
+        plt.scatter(female_based_df["Item Purchased"],
+                    female_based_df["Value"],
+                    label="Female",
+                    color="orange",
+                    alpha=0.8,
+                    s=100)
+        
+        plt.xlabel("Item Purchased", fontsize=14)
+        plt.ylabel("Values", fontsize=14)
+        plt.title("Gender and Item Purchased Comparison", fontsize=20)
+        plt.tight_layout()
+        plt.legend()
+        plt.show()
+        
+    def gender_based_category(self):
+        male_based_df = self.__gender_and_item_separator(gender="Male", item="Category")
+        female_based_df = self.__gender_and_item_separator(gender="Female", item="Category")
+        
+        plt.figure(figsize=self.figure_size)
+        
+        plt.scatter(male_based_df["Category"],
+                    male_based_df["Value"],
+                    label="Male",
+                    color="skyblue",
+                    alpha=0.8,
+                    s=100)
+        
+        plt.scatter(female_based_df["Category"],
+                    female_based_df["Value"],
+                    label="Female",
+                    color="orange",
+                    alpha=0.8,
+                    s=100)
+        
+        plt.xlabel("Category", fontsize=14)
+        plt.ylabel("Values", fontsize=14)
+        plt.title("Gender and Category Comparison", fontsize=20)
+        plt.tight_layout()
+        plt.legend()
+        plt.show()
     
     def spending_pattern(self):
         pass
@@ -221,7 +279,9 @@ def main():
         print("5. Purchase Amount analysis")
         print("6. Color Analysis")
         print("7. Payment Method Analysis")
-        print("8. Frequency of Purchases analsis")
+        print("8. Frequency of Purchases analysis")
+        print("9. Gender and Item purchase comparison")
+        print("10.  Gender and Category comparison")
         print("Exit\n")
 
         
@@ -245,6 +305,10 @@ def main():
                 analyze.payment_method()
             case "8":
                 analyze.frequency_purchases()
+            case "9":
+                analyze.gender_based_purchase()
+            case "10":
+                analyze.gender_based_category()
             case "exit":
                 sys.exit()
             case _:
