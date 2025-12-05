@@ -20,15 +20,33 @@ class Shoping_Behavior:
         gender_and_item_df = gender_and_item_df.reset_index()
         return gender_and_item_df
     
+    def __age_separated_df(self):
+        child = len(self.df[self.df["Age"]<18])
+        young_adult = len(self.df[(self.df["Age"]>=18) & (self.df["Age"]<25)])
+        adult = len(self.df[(self.df["Age"]>=25) & (self.df["Age"]<60)])
+        senior_citizen = len(self.df[(self.df["Age"]>=60)])
+        
+        age_df = pd.DataFrame({"Category": ["Child (0-17)", "Young Adult (18-24)", "Adult (25-60)", "Senior Citizen (>60)"],
+                                "Value": [child, young_adult, adult, senior_citizen]})
+        
+        filtered_age_df = age_df[age_df["Value"] != 0]
+        
+        return filtered_age_df
+    
+    def __count_df(self, item):
+        gender_df = pd.DataFrame(self.df[item].value_counts())
+        gender_df = gender_df.rename(columns={'count': 'Value'})
+        gender_df = gender_df.reset_index()
+        
+        return gender_df
+    
     # ================================
     # Gender count
     # ================================
     def gender_count(self):
         
         # Filtering and Creating DataFrame 
-        gender_df = pd.DataFrame(self.df["Gender"].value_counts())
-        gender_df = gender_df.rename(columns={'count': 'Value'})
-        gender_df = gender_df.reset_index()
+        gender_df = self.__count_df("Gender")
         
         # Creating Pie chart
         gender_df.plot.pie(y="Value",
@@ -47,27 +65,17 @@ class Shoping_Behavior:
     # ================================
     # Age separation 
     # ================================
-    def age_separation(self):
-        # Filtering 
-        child = len(self.df[self.df["Age"]<18])
-        young_adult = len(self.df[(self.df["Age"]>=18) & (self.df["Age"]<25)])
-        adult = len(self.df[(self.df["Age"]>=25) & (self.df["Age"]<60)])
-        senior_citizen = len(self.df[(self.df["Age"]>=60)])
-        
-        
-        # Creating DataFrame 
-        age_df = pd.DataFrame({"Category": ["Child (0-17)", "Young Adult (18-24)", "Adult (25-60)", "Senior Citizen (>60)"],
-                                "Value": [child, young_adult, adult, senior_citizen]})
-        
-        filtered_age_df = age_df[age_df["Value"] != 0]
+    def separated_age_analysis(self):
+                
+        age_df = self.__age_separated_df()
 
         # Pie chart
-        filtered_age_df.plot.pie(y="Value",
-                                 labels = filtered_age_df["Category"],
-                                 autopct="%1.1f%%",
-                                 shadow=True,
-                                 figsize = self.figure_size,
-                                 textprops={'fontsize': 14})
+        age_df.plot.pie(y="Value",
+                        labels = age_df["Category"],
+                        autopct="%1.1f%%",
+                        shadow=True,
+                        figsize = self.figure_size,
+                        textprops={'fontsize': 14})
 
         plt.title("Customer analysis with age", fontsize=20)
         plt.tight_layout()
@@ -78,9 +86,7 @@ class Shoping_Behavior:
     # ================================
     def item_list(self):
         # Creating DataFrame and cleaning
-        items_df = pd.DataFrame(self.df["Item Purchased"].value_counts())
-        items_df = items_df.rename(columns={"count": "Value"})
-        items_df = items_df.reset_index()
+        items_df = self.__count_df("Item Purchased")
         
         colour = self.__color_genarator(items_df)
         
@@ -106,10 +112,7 @@ class Shoping_Behavior:
     # Catagory separation
     # ================================
     def category(self):
-        category_df = pd.DataFrame(self.df["Category"].value_counts())
-        category_df = category_df.rename(columns={"count": "Value"})
-        category_df = category_df.reset_index()
-        
+        category_df = self.__count_df("Category")
         category_df.plot.pie(y="Value",
                              labels=category_df["Category"],
                              autopct="%1.1f%%",
@@ -141,9 +144,7 @@ class Shoping_Behavior:
 
     def color_analysis(self):
         # color DataFrame
-        color_df = pd.DataFrame(self.df["Color"].value_counts())
-        color_df = color_df.rename(columns={"count": "Value"})
-        color_df = color_df.reset_index()
+        color_df = self.__count_df("Color")
         
         colors = self.__color_genarator(color_df)
         
@@ -165,9 +166,7 @@ class Shoping_Behavior:
     
     def payment_method(self):
         # Payment Methods DataFrame
-        payment_method_df = pd.DataFrame(self.df["Payment Method"].value_counts())
-        payment_method_df = payment_method_df.rename(columns={"count": "Value"})
-        payment_method_df = payment_method_df.reset_index()
+        payment_method_df = self.__count_df("Payment Method")
         
         # Plotting the Pie Chart
         payment_method_df.plot.pie(y="Value",
@@ -184,9 +183,7 @@ class Shoping_Behavior:
         
     def frequency_purchases(self):
         # Frequency of Purchases DataFrame
-        frequency_purchases_df = pd.DataFrame(self.df["Frequency of Purchases"].value_counts())
-        frequency_purchases_df = frequency_purchases_df.rename(columns={"count": "Value"})
-        frequency_purchases_df = frequency_purchases_df.reset_index()
+        frequency_purchases_df = self.__count_df("Frequency of Purchases")
         
         colors = self.__color_genarator(frequency_purchases_df)
         
@@ -257,8 +254,70 @@ class Shoping_Behavior:
         plt.legend()
         plt.show()
     
-    def spending_pattern(self):
-        pass
+    def spending_pattern(self):     
+        # Age separate and avg of all spending 
+        child_df = self.df[self.df["Age"] < 18]
+        child_spending = child_df["Purchase Amount (USD)"].mean()
+        
+        young_adult_df = self.df[(self.df["Age"] >= 18) & (self.df["Age"] < 25)]
+        young_adult_spending = young_adult_df["Purchase Amount (USD)"].mean()
+        
+        adult_df = self.df[(self.df["Age"]>=25) & (self.df["Age"]<60)]
+        adult_spending = adult_df["Purchase Amount (USD)"].mean()
+        
+        senior_citizen_df = self.df[(self.df["Age"]>=60)]
+        senior_citizen_spending = senior_citizen_df["Purchase Amount (USD)"].mean()
+        
+        age_spending_df = pd.DataFrame({"Category": ["Child (0-17)", "Young Adult (18-24)", "Adult (25-60)", "Senior Citizen (>60)"],
+                                "Value": [child_spending, young_adult_spending, adult_spending, senior_citizen_spending]})
+        
+        age_spending_df = age_spending_df.dropna()
+        
+        colors_for_age = self.__color_genarator(age_spending_df)
+        
+        
+        # Gender separate and avg of all spending
+        male_df = self.df[self.df["Gender"] == "Male"]
+        male_spending = male_df["Purchase Amount (USD)"].mean()
+        
+        female_df = self.df[self.df["Gender"] == "Female"]
+        female_spending = female_df["Purchase Amount (USD)"].mean()
+        
+        gender_spending_df = pd.DataFrame({"Category": ["Male", "Female"],
+                                "Value": [male_spending, female_spending]})
+        
+        colors_for_gender = self.__color_genarator(gender_spending_df)
+        
+        # Plotting
+        
+        figure, axes = plt.subplots(1,2, figsize=self.figure_size)
+        
+        axes[0].bar(age_spending_df["Category"],
+                    age_spending_df["Value"],
+                    color = colors_for_age)
+        
+        axes[0].set_ylim(min(age_spending_df["Value"]) - 10,
+                         max(age_spending_df["Value"]) + 10)
+        
+        axes[0].set_title("Spending analysis according to Age", fontsize=18, fontweight="bold")
+        axes[0].set_xlabel("Age Category", fontsize=14)
+        axes[0].set_ylabel("Avg Spending", fontsize=14)
+        
+        axes[1].bar(gender_spending_df["Category"],
+                    gender_spending_df["Value"], 
+                    color = colors_for_gender)
+        
+        axes[1].set_ylim(min(age_spending_df["Value"]) - 10,
+                         max(age_spending_df["Value"]) + 10)
+        
+        axes[1].set_title("Spending analysis according to Gender", fontsize=18, fontweight="bold")
+        axes[1].set_xlabel("Gender Category", fontsize=14)
+        axes[1].set_ylabel("Avg Spending", fontsize=14)
+        
+        figure.suptitle("Average Customer Spending Analysis", fontsize=20, fontweight="bold")
+        plt.tight_layout()
+        plt.show()
+        
     
     def age_purchase_behavior(self):
         pass
@@ -281,7 +340,8 @@ def main():
         print("7. Payment Method Analysis")
         print("8. Frequency of Purchases analysis")
         print("9. Gender and Item purchase comparison")
-        print("10.  Gender and Category comparison")
+        print("10. Gender and Category comparison")
+        print("11. Spending Pattern analysis")
         print("Exit\n")
 
         
@@ -292,7 +352,7 @@ def main():
             case "1":
                 analyze.gender_count()
             case "2":
-                analyze.age_separation()
+                analyze.separated_age_analysis()
             case "3":
                 analyze.item_list()
             case "4":
@@ -309,6 +369,8 @@ def main():
                 analyze.gender_based_purchase()
             case "10":
                 analyze.gender_based_category()
+            case "11":
+                analyze.spending_pattern()
             case "exit":
                 sys.exit()
             case _:
